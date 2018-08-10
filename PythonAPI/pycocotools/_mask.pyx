@@ -85,9 +85,10 @@ cdef class Masks:
         self._h = h
         self._w = w
         self._n = n
-    # def __dealloc__(self):
+    def __dealloc__(self):
         # the memory management of _mask has been passed to np.ndarray
         # it doesn't need to be freed here
+        free(self._mask)
 
     # called when passing into np.array() and return an np.ndarray in column-major order
     def __array__(self):
@@ -96,7 +97,7 @@ cdef class Masks:
         # Create a 1D array, and reshape it to fortran/Matlab column-major array
         ndarray = np.PyArray_SimpleNewFromData(1, shape, np.NPY_UINT8, self._mask).reshape((self._h, self._w, self._n), order='F')
         # The _mask allocated by Masks is now handled by ndarray
-        PyArray_ENABLEFLAGS(ndarray, np.NPY_OWNDATA)
+        #PyArray_ENABLEFLAGS(ndarray, np.NPY_OWNDATA)
         return ndarray
 
 # internal conversion from Python RLEs object to compressed RLE format
